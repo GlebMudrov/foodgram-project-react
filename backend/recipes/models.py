@@ -1,6 +1,5 @@
-from django.db import models
 from django.core.validators import MinValueValidator
-
+from django.db import models
 from users.models import User
 
 
@@ -57,7 +56,9 @@ class Recipe(models.Model):
         max_length=200,
     )
 
-    image = models.ImageField('Картинка',)
+    image = models.ImageField('Картинка',
+        upload_to='recipes/'
+    )
 
     text = models.TextField('Текстовое описание',)
 
@@ -107,7 +108,7 @@ class IngredientInRecipe(models.Model):
 
     amount = models.PositiveSmallIntegerField(
         verbose_name='Количество',
-        
+
         validators=[
             MinValueValidator(1, 'Количество не может быть менее 1 ед.')
         ],
@@ -119,7 +120,7 @@ class IngredientInRecipe(models.Model):
 
     def __str__(self):
         return f'{self.ingredient}: {self.amount}'
-        
+
 
 class Favorite(models.Model):
     user = models.ForeignKey(
@@ -139,7 +140,7 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
-    
+
     def __str__(self):
         return f'{self.user} - {self.recipe}'
 
@@ -162,7 +163,7 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки покупок'
-    
+
     def __str__(self):
         return f'{self.user} - {self.recipe}'
 
