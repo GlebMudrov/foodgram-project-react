@@ -20,13 +20,18 @@ cd foodgram-project-react
 ```
 python -m venv venv
 . venv/scripts/activate
-api
+pip install -r backend/requirements.txt
 ```
-Выполнить миграции, создать суперпользователя, импортировать ингриденты в базу данных, собрать статику::
+Выполнить миграции, создать суперпользователя, импортировать ингриденты в базу данных, собрать статику:
 ```
 cd backend/
 python manage.py migrate --run-syncdb
 python manage.py createsuperuser
-python manage.py load_data
+python manage.py import_data
 python manage.py collectstatic --no-input
 ```
+Запуск сервера:
+```
+python manage.py runserver
+```
+Сервер станет доступен по адресу http://localhost:8000/api/ или http://127.0.0.1:8000/api/
