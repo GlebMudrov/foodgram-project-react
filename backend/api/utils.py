@@ -1,9 +1,9 @@
-from recipes.models import Recipe
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from api.serializers import RecipeShowSerializer
+from recipes.models import Recipe
 
 
 def add_or_delete_object_model(self, model, pk, serializer, errors):

@@ -1,5 +1,6 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
 from users.models import User
 
 
@@ -79,7 +80,9 @@ class Recipe(models.Model):
         'Время приготовления в мин.',
         validators=[
             MinValueValidator(
-                1, 'Время приготовления должно составлять не менее 1 мин.')
+                1, 'Время приготовления должно составлять не менее 1 мин.'),
+            MaxValueValidator(
+                1440, 'Время приготовления должно составлять не более суток.'),
         ],
     )
 
@@ -110,7 +113,8 @@ class IngredientInRecipe(models.Model):
         verbose_name='Количество',
 
         validators=[
-            MinValueValidator(1, 'Количество не может быть менее 1 ед.')
+            MinValueValidator(1, 'Количество не может быть менее 1 ед.'),
+            MaxValueValidator(50, 'Количество не может быть более 50 ед.'),
         ],
     )
 

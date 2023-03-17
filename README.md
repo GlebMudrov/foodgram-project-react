@@ -19,7 +19,8 @@ cd foodgram-project-react
 Создание и запуск виртуального окружения:
 ```
 python -m venv venv
-. venv/scripts/activate
+. venv/Scripts/activate
+pip install --upgrade pip
 pip install -r backend/requirements.txt
 ```
 Выполнить миграции, создать суперпользователя, импортировать ингриденты в базу данных, собрать статику:
