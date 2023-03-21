@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.db.models import Sum
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -13,7 +14,7 @@ from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPageNumberPagination
 from api.permissions import IsAdminOrReadOnly, IsAuthorOrAdminOrReadOnly
 from api.serializers import (CustomUserSerializer, FavoriteSerializer,
-                             FollowSerializer, IngredientSerializer,
+                             FollowSerializer, IngredientSerializer, 
                              RecipeCreateSerializer, RecipeSerializer,
                              ShoppingCartSerializer, TagSerializer)
 from api.utils import add_or_delete_object_model
@@ -34,6 +35,7 @@ class IngredientViewSet(ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = None
     filter_backends = (IngredientFilter,)
+    search_fields = ('^name',)
 
 
 class RecipeViewSet(ModelViewSet):
@@ -54,30 +56,30 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True,
             methods=['post', 'delete'],
             permission_classes=[IsAuthenticated],
-            )
+    )
     def favorite(self, request, pk):
         errors = 'Данный рецепт отсутствует в избранном'
         return add_or_delete_object_model(
-            Favorite, pk, FavoriteSerializer, errors
+            Favorite, request, pk, FavoriteSerializer, errors
         )
 
     @action(detail=True,
             methods=['post', 'delete'],
             permission_classes=[IsAuthenticated],
-            )
+    )
     def shopping_cart(self, request, pk):
         errors = 'Данный рецепт отсутствует в вашем списке покупок'
         return add_or_delete_object_model(
-            ShoppingCart, pk, ShoppingCartSerializer, errors
+            ShoppingCart, request, pk, ShoppingCartSerializer, errors
         )
 
     @action(detail=False,
-            methods=['get', ],
+            methods=['get',],
             permission_classes=[IsAuthenticated],
-            )
+    )
     def download_shopping_cart(self, request):
         ingredients = IngredientInRecipe.objects.filter(
-            recipe__cart__user=request.user).values(
+            recipe__shopping_cart__user=request.user).values(
             'ingredient__name', 'ingredient__measurement_unit').annotate(
             total_amount=Sum('amount')
         )
@@ -95,7 +97,6 @@ class RecipeViewSet(ModelViewSet):
         )
         return file
 
-
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
@@ -105,7 +106,7 @@ class CustomUserViewSet(UserViewSet):
         detail=False,
         methods=['get'],
         permission_classes=[IsAuthenticated],
-            )
+    )
     def subscriptions(self, request):
         queryset = Follow.objects.filter(user=self.request.user)
         pages = self.paginate_queryset(queryset)
@@ -119,8 +120,9 @@ class CustomUserViewSet(UserViewSet):
     @action(
         detail=True,
         methods=['post', 'delete'],
-        permission_classes=[IsAuthenticated],
-            )
+        permission_classes=[IsAuthenticated,],
+        serializer_class=FollowSerializer,
+    )
     def subscribe(self, request, id=None):
         user = self.request.user
         author = get_object_or_404(User, id=id)
@@ -130,13 +132,21 @@ class CustomUserViewSet(UserViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         if request.method == 'POST':
-            if Follow.objects.filter(user=user, author=author).exists():
+            try:
+                subscription = Follow.objects.create(user=user, author=author)
+            except IntegrityError:
                 return Response(
                     {'error': 'Вы уже подписаны на этого автора'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            Follow.objects.get_or_create(user=user, author=author)
-            return Response(status=status.HTTP_201_CREATED)
+            serializer = self.get_serializer(
+                subscription,
+                context={'request': request},
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             Follow.objects.filter(user=user, author=author).delete()
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            status=status.HTTP_400_BAD_REQUEST
+        )

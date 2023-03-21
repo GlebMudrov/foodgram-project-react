@@ -1,6 +1,7 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import (Favorite, Ingredient, IngredientInRecipe, Recipe,
                             ShoppingCart, Tag)
@@ -70,27 +71,30 @@ class RecipeSerializer(serializers.ModelSerializer):
         many=True,
         read_only=True
     )
-    is_favorite = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    image = Base64ImageField()
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField(
+        method_name='get_is_in_shopping_cart'
+    )
 
     class Meta:
         model = Recipe
         fields = (
             'id', 'name', 'author', 'text', 'ingredients',
             'tags', 'image', 'cooking_time',
-            'is_favorite', 'is_in_shopping_cart'
+            'is_favorited', 'is_in_shopping_cart'
         )
 
-    def get_is_favorite(self, obj):
+    def get_is_favorited(self, obj):
         request = self.context.get('request')
-        if request is None or request.user.is_anonymous:
+        if request.user.is_anonymous:
             return False
         return Favorite.objects.filter(
             user=request.user, recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context.get('request')
-        if request is None or request.user.is_anonymous:
+        if request.user.is_anonymous:
             return False
         return ShoppingCart.objects.filter(
             user=request.user, recipe=obj).exists()
@@ -200,7 +204,7 @@ class FollowSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='author.first_name')
     last_name = serializers.CharField(source='author.last_name')
     is_subscribed = serializers.BooleanField(read_only=True)
-    recipes = serializers.SerializerMethodField()
+    recipes = RecipeShowSerializer(many=True, source='author.recipes')
     recipes_count = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -215,27 +219,22 @@ class FollowSerializer(serializers.ModelSerializer):
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.author).count()
 
-    def get_recipes(self, obj):
-        request = self.context.get('request')
-        quertset = Recipe.objects.filter(author=obj.author)
-        limit = request.query_params.get('recipe_limit')
-        serializers = RecipeShowSerializer(
-            quertset,
-            many=True,
-            context={'request': request}
-        )
-        if limit:
-            return serializers.data[:int(limit)]
-        return serializers.data
-
     def get_is_subscribed(self, obj):
-        return True
+        return Follow.objects.filter(user=obj.user, author=obj.author).exists()
+
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favorite
         fields = ('user', 'recipe')
+        validators = (
+            UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже есть в избранном'
+            ),
+        )
 
     def to_representation(self, instance):
         request = self.context.get('request')
@@ -248,6 +247,13 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShoppingCart
         fields = ('user', 'recipe')
+        validators = (
+            UniqueTogetherValidator(
+                queryset=ShoppingCart.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже есть в списке покупок'
+            ),
+        )
 
     def to_representation(self, instance):
         request = self.context.get('request')

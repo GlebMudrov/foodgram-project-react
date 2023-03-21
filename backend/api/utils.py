@@ -6,20 +6,20 @@ from api.serializers import RecipeShowSerializer
 from recipes.models import Recipe
 
 
-def add_or_delete_object_model(self, model, pk, serializer, errors):
+def add_or_delete_object_model(model, request, pk, serializer, errors):
     recipe = get_object_or_404(Recipe, id=pk)
     serializer = serializer(
         data={
-            'user': self.request.user.id,
+            'user': request.user.id,
             'recipe': recipe.id
         }
     )
-    if self.request.method == 'POST':
+    if request.method == 'POST':
         serializer.is_valid(raise_exception=True)
         serializer.save()
         serializer = RecipeShowSerializer(recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    objects = model.objects.filter(user=self.request.user, recipe=recipe)
+    objects = model.objects.filter(user=request.user, recipe=recipe)
     if not objects.exists():
         return Response(
             {'errors': errors},

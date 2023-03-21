@@ -86,9 +86,14 @@ class Recipe(models.Model):
         ],
     )
 
+    pub_date = models.DateTimeField('Дата публикации',
+        auto_now=True,
+    )
+
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ['-pub_date']
 
     def __str__(self):
         return self.name
@@ -114,7 +119,7 @@ class IngredientInRecipe(models.Model):
 
         validators=[
             MinValueValidator(1, 'Количество не может быть менее 1 ед.'),
-            MaxValueValidator(50, 'Количество не может быть более 50 ед.'),
+            MaxValueValidator(10000, 'Количество не может быть более 10000 ед.'),
         ],
     )
 
