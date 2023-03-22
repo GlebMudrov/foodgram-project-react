@@ -128,8 +128,8 @@ DJOSER = {
 CSRF_TRUSTED_ORIGINS = [
     'http://*localhost',
     'https://*localhost',
-    '84.201.164.97',
-    'foodgram-mudrov.hopto.org'
+    'http://*84.201.164.97',
+    'http://*foodgram-mudrov.hopto.org',
 ]
 
 LANGUAGE_CODE = 'ru'
