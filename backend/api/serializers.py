@@ -154,15 +154,15 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Необходимо указать время приготовления.'
             )
-        
+
         has_letter = any(symbol.isalpha() for symbol in data['name'])
         if not has_letter:
             raise serializers.ValidationError(
-                    'Имя рецепта не может содержать только символы и цифры.'
-                )
-        
+                'Имя рецепта не может содержать только символы и цифры.'
+            )
+
         return data
-    
+
     def create_ingredients(self, ingredients, recipe):
         for ingredient in ingredients:
             IngredientInRecipe.objects.create(
