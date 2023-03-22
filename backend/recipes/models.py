@@ -5,12 +5,14 @@ from users.models import User
 
 
 class Tag(models.Model):
-    name = models.CharField('Название тега',
+    name = models.CharField(
+        'Название тега',
         max_length=200,
         unique=True,
     )
 
-    color = models.CharField('Цветовой HEX-код',
+    color = models.CharField(
+        'Цветовой HEX-код',
         max_length=7,
     )
 
