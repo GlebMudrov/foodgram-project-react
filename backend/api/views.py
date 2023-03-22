@@ -72,8 +72,8 @@ class RecipeViewSet(ModelViewSet):
         )
 
     @action(detail=False,
-            methods=['get',],
-            permission_classes=[IsAuthenticated],)
+            methods=['get', ],
+            permission_classes=[IsAuthenticated, ],)
     def download_shopping_cart(self, request):
         ingredients = IngredientInRecipe.objects.filter(
             recipe__shopping_cart__user=request.user).values(
@@ -103,8 +103,7 @@ class CustomUserViewSet(UserViewSet):
     @action(
         detail=False,
         methods=['get'],
-        permission_classes=[IsAuthenticated],
-    )
+        permission_classes=[IsAuthenticated, ],)
     def subscriptions(self, request):
         queryset = Follow.objects.filter(user=self.request.user)
         pages = self.paginate_queryset(queryset)
@@ -118,9 +117,8 @@ class CustomUserViewSet(UserViewSet):
     @action(
         detail=True,
         methods=['post', 'delete'],
-        permission_classes=[IsAuthenticated,],
-        serializer_class=FollowSerializer,
-    )
+        permission_classes=[IsAuthenticated, ],
+        serializer_class=FollowSerializer,)
     def subscribe(self, request, id=None):
         user = self.request.user
         author = get_object_or_404(User, id=id)

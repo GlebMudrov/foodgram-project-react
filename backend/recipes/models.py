@@ -127,7 +127,7 @@ class IngredientInRecipe(models.Model):
 
         validators=[
             MinValueValidator(1, 'Количество не может быть менее 1 ед.'),
-            MaxValueValidator(10000, 
+            MaxValueValidator(10000,
                               'Количество не может быть более 10000 ед.'),
         ],
     )

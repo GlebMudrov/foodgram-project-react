@@ -184,11 +184,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return super().update(recipe, validated_data)
 
     def to_representation(self, recipe):
-        data = RecipeSerializer(
+        return RecipeSerializer(
             recipe,
             context={'request': self.context.get('request')},
         ).data
-        return data
 
 
 class RecipeShowSerializer(serializers.ModelSerializer):
