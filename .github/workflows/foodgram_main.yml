@@ -57,7 +57,7 @@ jobs:
         script: |
           sudo docker-compose stop
           sudo docker-compose rm infra-backend-1
-          sudo docker-compose rm infra-backend-1
+          sudo docker-compose rm infra-frontend-1
           sudo docker-pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:v1.5
           sudo docker-pull ${{ secrets.DOCKER_USERNAME }}/foodgram-frontend:v1.0
           touch .env
