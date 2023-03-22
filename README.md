@@ -1,38 +1,56 @@
-# Foodgram (в процессе разработки)
+![yamdb_workflow](https://github.com/GlebMudrov/foodgram-project-react/actions/workflows/foodgram_main.yml/badge.svg)
+# Проект Foodgram
+
+### http://foodgram-mudrov.hopto.org/
+### 84.201.164.97
+
+### Админ-зона:
+user: admin
+password: admin
 
 ### Описание проекта:
 Foodgram - онлайн-сервис, где пользователи могут публиковать рецепты, подписываться на публикации других пользователей, добавлять понравившиеся рецепты в список «Избранное», а перед походом в магазин скачивать сводный список продуктов, необходимых для приготовления одного или нескольких выбранных блюд.
 
 ### Технологии :
 - Python
-- Django
+- Django 
 - Django REST Framework
+- Docker
+- Gunicorn
+- Nginx
+- PostgreSQL
 
-### Запуск проекта локально:
+### Запуск проекта локально (адаптировано под Windows):
 Клонировать репозиторий и перейти в него в командной строке (использовать ssh):
 ```
 git@github.com:GlebMudrov/foodgram-project-react.git
 ```
 ```
-cd foodgram-project-react
+cd foodgram-project-react/infra/
 ```
-Создание и запуск виртуального окружения:
+Создать файл .env и заполнить его данными:
 ```
-python -m venv venv
-. venv/Scripts/activate
-pip install --upgrade pip
-pip install -r backend/requirements.txt
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+DB_HOST=db
+DB_PORT=5432
 ```
-Выполнить миграции, создать суперпользователя, импортировать ингриденты в базу данных, собрать статику:
+Запуск проекта в контейнерах Docker:
 ```
-cd backend/
-python manage.py migrate --run-syncdb
-python manage.py createsuperuser
-python manage.py import_data
-python manage.py collectstatic --no-input
+docker-compose up -d
 ```
-Запуск сервера:
+Провести миграции, создать суперпользователя, собрать статику и импорт тегов в базу данных:
 ```
-python manage.py runserver
+docker-compose exec backend python manage.py makemigrations users
+docker-compose exec backend python manage.py makemigrations recipes
+docker-compose exec backend python manage.py migrate
+docker-compose exec backend python manage.py createsuperuser
+docker-compose exec backend python manage.py collectstatic --no-input
+docker-compose exec backend python manage.py import_data
 ```
-Сервер станет доступен по адресу http://localhost:8000/api/ или http://127.0.0.1:8000/api/
+Проект станет доступен по адресу http://localhost/
+Админ-зона: http://localhost/admin
+
+### Автор проекта:  <a href= "https://github.com/GlebMudrov">__Мудров Глеб__<a/>
