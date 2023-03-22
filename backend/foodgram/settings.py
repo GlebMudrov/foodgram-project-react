@@ -12,7 +12,12 @@ SECRET_KEY = get_random_secret_key()
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'backend']
+ALLOWED_HOSTS = [
+    'localhost',
+    'backend',
+    '84.201.164.97',
+    'foodgram-mudrov.hopto.org'
+]
 
 
 INSTALLED_APPS = [
