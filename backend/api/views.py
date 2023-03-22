@@ -14,7 +14,7 @@ from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPageNumberPagination
 from api.permissions import IsAdminOrReadOnly, IsAuthorOrAdminOrReadOnly
 from api.serializers import (CustomUserSerializer, FavoriteSerializer,
-                             FollowSerializer, IngredientSerializer, 
+                             FollowSerializer, IngredientSerializer,
                              RecipeCreateSerializer, RecipeSerializer,
                              ShoppingCartSerializer, TagSerializer)
 from api.utils import add_or_delete_object_model
@@ -55,8 +55,7 @@ class RecipeViewSet(ModelViewSet):
 
     @action(detail=True,
             methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated],
-    )
+            permission_classes=[IsAuthenticated],)
     def favorite(self, request, pk):
         errors = 'Данный рецепт отсутствует в избранном'
         return add_or_delete_object_model(
@@ -65,8 +64,7 @@ class RecipeViewSet(ModelViewSet):
 
     @action(detail=True,
             methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated],
-    )
+            permission_classes=[IsAuthenticated],)
     def shopping_cart(self, request, pk):
         errors = 'Данный рецепт отсутствует в вашем списке покупок'
         return add_or_delete_object_model(
@@ -75,8 +73,7 @@ class RecipeViewSet(ModelViewSet):
 
     @action(detail=False,
             methods=['get',],
-            permission_classes=[IsAuthenticated],
-    )
+            permission_classes=[IsAuthenticated],)
     def download_shopping_cart(self, request):
         ingredients = IngredientInRecipe.objects.filter(
             recipe__shopping_cart__user=request.user).values(
@@ -96,6 +93,7 @@ class RecipeViewSet(ModelViewSet):
             filename
         )
         return file
+
 
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()

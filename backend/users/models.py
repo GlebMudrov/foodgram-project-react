@@ -3,21 +3,25 @@ from django.db import models
 
 
 class User(AbstractUser):
-    username = models.CharField('Логин',
+    username = models.CharField(
+        'Логин',
         max_length=150,
         unique=True,
     )
 
-    email = models.EmailField('Электронная почта',
+    email = models.EmailField(
+        'Электронная почта',
         max_length=254,
         unique=True,
     )
 
-    first_name = models.CharField('Имя',
+    first_name = models.CharField(
+        'Имя',
         max_length=150,
     )
 
-    last_name = models.CharField('Фамилия',
+    last_name = models.CharField(
+        'Фамилия',
         max_length=150,
     )
 

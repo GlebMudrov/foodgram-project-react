@@ -223,7 +223,6 @@ class FollowSerializer(serializers.ModelSerializer):
         return Follow.objects.filter(user=obj.user, author=obj.author).exists()
 
 
-
 class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favorite

@@ -16,7 +16,8 @@ class Tag(models.Model):
         max_length=7,
     )
 
-    slug = models.SlugField('Слаг тега',
+    slug = models.SlugField(
+        'Слаг тега',
         max_length=200,
         unique=True
     )
@@ -30,11 +31,13 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    name = models.CharField('Название ингредиента',
+    name = models.CharField(
+        'Название ингредиента',
         max_length=200,
     )
 
-    measurement_unit = models.CharField('Единицы измерения',
+    measurement_unit = models.CharField(
+        'Единицы измерения',
         max_length=200,
     )
 
@@ -55,11 +58,13 @@ class Recipe(models.Model):
         verbose_name='Автор публикации',
     )
 
-    name = models.CharField('Название рецепта',
+    name = models.CharField(
+        'Название рецепта',
         max_length=200,
     )
 
-    image = models.ImageField('Картинка',
+    image = models.ImageField(
+        'Картинка',
         upload_to='recipes/'
     )
 
@@ -88,7 +93,8 @@ class Recipe(models.Model):
         ],
     )
 
-    pub_date = models.DateTimeField('Дата публикации',
+    pub_date = models.DateTimeField(
+        'Дата публикации',
         auto_now=True,
     )
 
@@ -121,7 +127,8 @@ class IngredientInRecipe(models.Model):
 
         validators=[
             MinValueValidator(1, 'Количество не может быть менее 1 ед.'),
-            MaxValueValidator(10000, 'Количество не может быть более 10000 ед.'),
+            MaxValueValidator(10000, 
+                              'Количество не может быть более 10000 ед.'),
         ],
     )
 
